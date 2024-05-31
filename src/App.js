@@ -7,7 +7,7 @@ const initialItems = [
 ];
 
 export default function App() {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState([]);
 
   function handleAddItems(item) {
     setItems((items) => [...items, item]);
@@ -34,7 +34,7 @@ export default function App() {
         onDeleteItem={handleDeleteItem}
         onToggleItem={handleToggleItem}
       />
-      <Status />
+      <Status items={items} />
     </div>
   );
 }
@@ -42,13 +42,13 @@ export default function App() {
 function Logo() {
   return <h1>🏝️ Far Away 🧳</h1>;
 }
+
 function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(5);
 
   function handleSubmit(e) {
     e.preventDefault();
-    // console.log(e);
 
     if (!description) return;
 
@@ -68,9 +68,6 @@ function Form({ onAddItems }) {
         value={quantity}
         onChange={(e) => setQuantity(Number(e.target.value))}
       >
-        {/* <option value={1}>1</option>
-        <option value={2}>2</option>
-        <option value={3}>3</option> */}
         {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
           <option value={num} key={num}>
             {num}
@@ -87,6 +84,7 @@ function Form({ onAddItems }) {
     </form>
   );
 }
+
 function PackingList({ items, onDeleteItem, onToggleItem }) {
   return (
     <div className="list">
@@ -120,10 +118,23 @@ function Item({ item, onDeleteItem, onToggleItem }) {
   );
 }
 
-function Status() {
+function Status({ items }) {
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start adding items to your packing list</em>
+      </p>
+    );
+
+  const numItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.round((numPacked / numItems) * 100);
+
   return (
     <footer className="stats">
-      You have X item on you list, and you already packed X (X%)
+      {percentage === 100
+        ? "You got everything ! Ready to go ✈️"
+        : `💼 You have ${numItems} item on you list, and you already packed ${numPacked} (${percentage}%) `}
     </footer>
   );
 }
